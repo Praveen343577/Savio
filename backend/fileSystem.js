@@ -21,9 +21,14 @@ function readQueue() {
     }
     try {
         const data = fs.readFileSync(QUEUE_FILE, 'utf8');
+        if (!data.trim()) {
+            writeQueue([]);
+            return [];
+        }
         return JSON.parse(data);
     } catch (error) {
-        console.error('ERROR: queue.json corrupted. Returning empty queue.', error);
+        console.error('ERROR: queue.json corrupted. Overwriting with empty array.', error.message);
+        writeQueue([]);
         return [];
     }
 }

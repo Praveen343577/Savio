@@ -14,60 +14,37 @@ const BASE_DOWNLOAD_DIR = 'D:\\Nu\\YIPT';
 
 /**
  * Dynamically builds the CLI command and arguments based on the platform.
- * Limits title/filename length to 100 characters to prevent Windows ENAMETOOLONG errors.
- * * @param {Object} item - The current queue item containing { url, platform }
- * @returns {Object} { binary, args }
  */
 function buildCommandArgs(item) {
     const today = new Date().toISOString().split('T')[0];
     const baseArgs = ['--cookies-from-browser', `chrome:${CHROME_PROFILE}`, '--write-info-json'];
 
-    switch (item.platform) {
-        case 'youtube':
-            return {
-                binary: 'yt-dlp',
-                args: [
-                    ...baseArgs,
-                    '--write-thumbnail',
-                    '-f', 'bestvideo+bestaudio/best',
-                    '--merge-output-format', 'mp4',
-                    '-o', path.join(BASE_DOWNLOAD_DIR, 'youtube', '%(uploader)s', today, '%(title).100s.%(ext)s'),
-                    item.url
-                ]
-            };
-        case 'instagram':
-            return {
-                binary: 'gallery-dl',
-                args: [
-                    ...baseArgs,
-                    '--directory', path.join(BASE_DOWNLOAD_DIR, 'instagram', '{username}', today),
-                    '--filename', '{content[:100]:?_{id}}.{extension}',
-                    item.url
-                ]
-            };
-        case 'twitter':
-            return {
-                binary: 'gallery-dl',
-                args: [
-                    ...baseArgs,
-                    // gallery-dl parses Twitter authors under author['name']
-                    '--directory', path.join(BASE_DOWNLOAD_DIR, 'twitter', "{author['name']}", today),
-                    '--filename', '{content[:100]:?_{tweet_id}}.{extension}',
-                    item.url
-                ]
-            };
-        case 'pinterest':
-            return {
-                binary: 'gallery-dl',
-                args: [
-                    ...baseArgs,
-                    '--directory', path.join(BASE_DOWNLOAD_DIR, 'pinterest', '{author}', today),
-                    '--filename', '{title[:100]:?_{id}}.{extension}',
-                    item.url
-                ]
-            };
-        default:
-            throw new Error(`Unsupported platform: ${item.platform}`);
+    if (item.platform === 'youtube') {
+        return {
+            binary: 'yt-dlp',
+            args: [
+                ...baseArgs,
+                '--write-thumbnail',
+                '-f', 'bestvideo+bestaudio/best',
+                '--merge-output-format', 'mp4',
+                // yt-dlp uses safe C-style formatting
+                '-o', path.join(BASE_DOWNLOAD_DIR, 'youtube', '%(uploader)s', today, '%(title).100s.%(ext)s'),
+                item.url
+            ]
+        };
+    } else {
+        // gallery-dl handles Instagram, Twitter, and Pinterest
+        return {
+            binary: 'gallery-dl',
+            args: [
+                ...baseArgs,
+                // --dest sets the base path. gallery-dl automatically creates /<platform>/<username>/ natively.
+                '--dest', BASE_DOWNLOAD_DIR,
+                // Safe format string: ID + Date. Prevents Python ValueError crashes from complex text parsing.
+                '--filename', `{id}_${today}.{extension}`,
+                item.url
+            ]
+        };
     }
 }
 
@@ -80,11 +57,11 @@ function buildCommandArgs(item) {
 function executeItem(item, onProgress) {
     return new Promise((resolve, reject) => {
         isCancelled = false;
-        
+
         const { binary, args } = buildCommandArgs(item);
-        
+
         // spawn allows us to intercept the live stream, unlike exec which buffers everything until the end
-        activeProcess = spawn(binary, args, { 
+        activeProcess = spawn(binary, args, {
             windowsHide: true // Prevents random cmd popups on Windows
         });
 
