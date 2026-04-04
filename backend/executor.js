@@ -33,15 +33,14 @@ function buildCommandArgs(item) {
             ]
         };
     } else {
-        // gallery-dl handles Instagram, Twitter, and Pinterest
+        // Send to temporary staging directory isolated by unique ID
+        const stagingDir = path.join(BASE_DOWNLOAD_DIR, 'staging', item.id);
         return {
             binary: 'gallery-dl',
             args: [
                 ...baseArgs,
-                // --dest sets the base path. gallery-dl automatically creates /<platform>/<username>/ natively.
-                '--dest', BASE_DOWNLOAD_DIR,
-                // Safe format string: ID + Date. Prevents Python ValueError crashes from complex text parsing.
-                '--filename', `{id}_${today}.{extension}`,
+                '--directory', stagingDir,
+                '--filename', '{id}.{extension}',
                 item.url
             ]
         };
