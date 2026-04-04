@@ -111,9 +111,8 @@ async function runLoop() {
                 }
             });
 
-            // If execution succeeded, attempt post-processing (e.g., .webp to .jpg)
-            // Predict the metadata path based on output schema to update it in postProcess
-            const today = new Date().toISOString().split('T')[0];
+            const dateObj = new Date();
+            const todayStr = `${dateObj.getFullYear()}_${String(dateObj.getMonth() + 1).padStart(2, '0')}_${String(dateObj.getDate()).padStart(2, '0')}`;
             const baseDir = 'D:\\Nu\\YIPT';
 
             if (item.platform !== 'youtube') {
@@ -130,59 +129,58 @@ async function runLoop() {
                         let author = meta.username || meta.author?.name || meta.author || 'Unknown_User';
                         author = author.replace(/[<>:"\/\\|?*]/g, '').trim();
 
-                        let rawCaption = meta.caption || meta.content || meta.title || 'Post';
-                        const finalName = cleanFilename(rawCaption);
+                        // Force capitalization of platform folder names as requested (Twitter, Pinterest)
+                        let platformName = item.platform;
+                        if (platformName === 'twitter' || platformName === 'pinterest') {
+                            platformName = platformName.charAt(0).toUpperCase() + platformName.slice(1);
+                        }
 
-                        const finalDir = path.join(baseDir, item.platform, author, today);
+                        const finalDir = path.join(baseDir, platformName, todayStr);
+                        const metaDir = path.join(finalDir, 'metadata');
+
                         if (!fs.existsSync(finalDir)) fs.mkdirSync(finalDir, { recursive: true });
+                        if (!fs.existsSync(metaDir)) fs.mkdirSync(metaDir, { recursive: true });
 
-                        const finalJsonPath = path.join(finalDir, `${finalName}.info.json`);
+                        const existingFiles = fs.readdirSync(finalDir);
+                        let vCount = 0;
+                        let pCount = 0;
 
-                        if (fs.existsSync(finalJsonPath)) {
-                            // Collision detected. Original file stays in place. Move only the new duplicate.
-                            const dupDir = path.join(finalDir, 'Potential Duplicates');
-                            if (!fs.existsSync(dupDir)) fs.mkdirSync(dupDir, { recursive: true });
-
-                            let dupNameBase = `${finalName} (${today})`;
-                            let dupJsonDest = path.join(dupDir, `${dupNameBase}.info.json`);
-
-                            // Failsafe: If duplicate happens multiple times on the exact same date
-                            let counter = 1;
-                            while (fs.existsSync(dupJsonDest)) {
-                                dupNameBase = `${finalName} (${today})_${counter}`;
-                                dupJsonDest = path.join(dupDir, `${dupNameBase}.info.json`);
-                                counter++;
-                            }
-
-                            // 1. Move incoming (NEW) metadata
-                            fs.renameSync(jsonPath, dupJsonDest);
-
-                            // 2. Move incoming (NEW) media files & post-process
-                            for (let i = 0; i < mediaFiles.length; i++) {
-                                const mediaFile = mediaFiles[i];
-                                const ext = path.extname(mediaFile);
-                                const suffix = mediaFiles.length > 1 ? `_${i + 1}` : '';
-                                const dupMediaDest = path.join(dupDir, `${dupNameBase}${suffix}${ext}`);
-
-                                fs.renameSync(path.join(stagingDir, mediaFile), dupMediaDest);
-                                await runPostProcess(dupMediaDest, dupJsonDest);
-                            }
-                        } else {
-                            // Standard operation (No collision). Move to final folder.
-                            fs.renameSync(jsonPath, finalJsonPath);
-
-                            for (let i = 0; i < mediaFiles.length; i++) {
-                                const mediaFile = mediaFiles[i];
-                                const ext = path.extname(mediaFile);
-                                const suffix = mediaFiles.length > 1 ? `_${i + 1}` : '';
-                                const finalMediaPath = path.join(finalDir, `${finalName}${suffix}${ext}`);
-
-                                fs.renameSync(path.join(stagingDir, mediaFile), finalMediaPath);
-                                await runPostProcess(finalMediaPath, finalJsonPath);
+                        const prefixPattern = new RegExp(`^${author} ([vp])(\\d+)`);
+                        for (const f of existingFiles) {
+                            const match = f.match(prefixPattern);
+                            if (match) {
+                                const num = parseInt(match[2], 10);
+                                if (match[1] === 'v' && num > vCount) vCount = num;
+                                if (match[1] === 'p' && num > pCount) pCount = num;
                             }
                         }
+
+                        let generatedPaths = [];
+                        let primaryName = '';
+
+                        for (let i = 0; i < mediaFiles.length; i++) {
+                            const mediaFile = mediaFiles[i];
+                            const ext = path.extname(mediaFile).toLowerCase();
+                            const isVideo = ['.mp4', '.webm', '.mov', '.mkv'].includes(ext);
+
+                            let typeChar = isVideo ? 'v' : 'p';
+                            let currentNum = isVideo ? ++vCount : ++pCount;
+                            let finalName = `${author} ${typeChar}${currentNum}`;
+
+                            if (i === 0) primaryName = finalName; // Use first media item name for the single JSON file
+
+                            const finalMediaPath = path.join(finalDir, finalName + ext);
+                            fs.renameSync(path.join(stagingDir, mediaFile), finalMediaPath);
+                            generatedPaths.push(finalMediaPath);
+                        }
+
+                        const finalJsonPath = path.join(metaDir, `${primaryName}.info.json`);
+                        fs.renameSync(jsonPath, finalJsonPath);
+
+                        for (const mediaPath of generatedPaths) {
+                            await runPostProcess(mediaPath, finalJsonPath);
+                        }
                     }
-                    // Cleanup staging
                     fs.rmSync(stagingDir, { recursive: true, force: true });
                 }
             }

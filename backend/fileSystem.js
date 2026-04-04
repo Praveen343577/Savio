@@ -34,18 +34,22 @@ function readQueue() {
 }
 
 function logFailedLink(platform, url) {
-    const today = new Date().toISOString().split('T')[0];
-    const targetDir = path.join(BASE_DOWNLOAD_DIR, platform, 'failedLinks', today);
-    const targetFile = path.join(targetDir, `${platform}.txt`);
+    const dateObj = new Date();
+    const todayStr = `${dateObj.getFullYear()}_${String(dateObj.getMonth() + 1).padStart(2, '0')}_${String(dateObj.getDate()).padStart(2, '0')}`;
 
-    try {
-        if (!fs.existsSync(targetDir)) {
-            fs.mkdirSync(targetDir, { recursive: true });
-        }
-        fs.appendFileSync(targetFile, `${url}\n`, 'utf8');
-    } catch (error) {
-        console.error(`ERROR: Could not append failed link to ${targetFile}`, error);
+    let platformName = platform;
+    if (platformName === 'twitter' || platformName === 'pinterest') {
+        platformName = platformName.charAt(0).toUpperCase() + platformName.slice(1);
     }
+
+    const targetDir = path.join('D:\\Nu\\YIPT', platformName, todayStr);
+
+    if (!fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
+    }
+
+    const failFile = path.join(targetDir, '@failedLinks.txt');
+    fs.appendFileSync(failFile, `${url}\n`);
 }
 
 module.exports = {

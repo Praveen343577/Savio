@@ -20,6 +20,8 @@ function buildCommandArgs(item) {
     const baseArgs = ['--cookies-from-browser', `chrome:${CHROME_PROFILE}`, '--write-info-json'];
 
     if (item.platform === 'youtube') {
+        const channelBase = path.join(BASE_DOWNLOAD_DIR, 'youtube', '%(uploader)s');
+        
         return {
             binary: 'yt-dlp',
             args: [
@@ -27,8 +29,12 @@ function buildCommandArgs(item) {
                 '--write-thumbnail',
                 '-f', 'bestvideo+bestaudio/best',
                 '--merge-output-format', 'mp4',
-                // yt-dlp uses safe C-style formatting
-                '-o', path.join(BASE_DOWNLOAD_DIR, 'youtube', '%(uploader)s', today, '%(title).100s.%(ext)s'),
+                // 1. Route primary media directly to the channel root folder
+                '-o', path.join(channelBase, '%(title).100s.%(ext)s'),
+                // 2. Route .info.json metadata to /metadata
+                '-o', 'infojson:' + path.join(channelBase, 'metadata', '%(title).100s.%(ext)s'),
+                // 3. Route thumbnails to /metadata
+                '-o', 'thumbnail:' + path.join(channelBase, 'metadata', '%(title).100s.%(ext)s'),
                 item.url
             ]
         };
