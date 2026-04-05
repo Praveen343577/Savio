@@ -72,6 +72,9 @@ function executeItem(item, onProgress) {
         // gallery-dl outputs fractions like [1/5] for multi-image posts. 
         const galleryRegex = /\[(\d+)\/(\d+)\]/;
 
+        // Buffer to accumulate stderr lines for error reporting
+        const stderrLines = [];
+
         activeProcess.stdout.on('data', (data) => {
             const output = data.toString();
 
@@ -92,6 +95,18 @@ function executeItem(item, onProgress) {
             }
         });
 
+        // Capture stderr lines in real-time so we have them at close time
+        activeProcess.stderr.on('data', (data) => {
+            const lines = data.toString().trim().split('\n');
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (trimmed) {
+                    stderrLines.push(trimmed);
+                    console.error(`[${binary.toUpperCase()}] ${trimmed}`);
+                }
+            }
+        });
+
         // Handle process termination (both natural and forced)
         activeProcess.on('close', (code) => {
             activeProcess = null; // Clear reference to prevent memory leaks
@@ -104,7 +119,9 @@ function executeItem(item, onProgress) {
             if (code === 0) {
                 resolve();
             } else {
-                reject(new Error(`Process exited with code ${code}`));
+                // Include the last 5 stderr lines in the error so engine.js can log the real reason
+                const errorSummary = stderrLines.slice(-5).join(' | ') || 'No stderr output captured';
+                reject(new Error(`Process exited with code ${code}: ${errorSummary}`));
             }
         });
 

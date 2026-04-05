@@ -126,7 +126,23 @@ async function runLoop() {
                         const jsonPath = path.join(stagingDir, jsonFile);
                         const meta = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
 
-                        let author = meta.username || meta.author?.name || meta.author || 'Unknown_User';
+                        let author;
+                        if (item.platform === 'pinterest') {
+                            author = meta.native_creator?.username
+                                || meta.origin_pinner?.username
+                                || meta.pinner?.username
+                                || 'Unknown_User';
+
+                        } else if (item.platform === 'instagram') {
+                            author = meta.username
+                                || meta.fullname
+                                || 'Unknown_User';
+
+                        } else if (item.platform === 'twitter') {
+                            author = meta.author?.name
+                                || meta.user?.name
+                                || 'Unknown_User';
+                        }
                         author = author.replace(/[<>:"\/\\|?*]/g, '').trim();
 
                         // Force capitalization of platform folder names as requested (Twitter, Pinterest)

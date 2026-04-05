@@ -8,9 +8,20 @@ function writeQueue(queueArray) {
     const tmpPath = QUEUE_FILE + '.tmp';
     try {
         fs.writeFileSync(tmpPath, JSON.stringify(queueArray, null, 2), 'utf8');
+        // Windows does not allow renameSync over an existing open file (EPERM).
+        // Unlinking the destination first sidesteps this limitation.
+        if (fs.existsSync(QUEUE_FILE)) {
+            fs.unlinkSync(QUEUE_FILE);
+        }
         fs.renameSync(tmpPath, QUEUE_FILE);
     } catch (error) {
         console.error('FATAL: Failed to write queue atomically.', error);
+        // Last-resort fallback: write directly if the tmp→rename dance fails
+        try {
+            fs.writeFileSync(QUEUE_FILE, JSON.stringify(queueArray, null, 2), 'utf8');
+        } catch (fallbackError) {
+            console.error('FATAL: Fallback direct write also failed.', fallbackError);
+        }
     }
 }
 
