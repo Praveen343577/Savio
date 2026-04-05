@@ -21,19 +21,16 @@ function buildCommandArgs(item) {
 
     if (item.platform === 'youtube') {
         const channelBase = path.join(BASE_DOWNLOAD_DIR, 'youtube', '%(uploader)s');
-        
+
         return {
             binary: 'yt-dlp',
             args: [
                 ...baseArgs,
                 '--write-thumbnail',
                 '-f', 'bestvideo+bestaudio/best',
-                '--merge-output-format', 'mp4',
-                // 1. Route primary media directly to the channel root folder
+                '--merge-output-format', 'mkv',
                 '-o', path.join(channelBase, '%(title).100s.%(ext)s'),
-                // 2. Route .info.json metadata to /metadata
                 '-o', 'infojson:' + path.join(channelBase, 'metadata', '%(title).100s.%(ext)s'),
-                // 3. Route thumbnails to /metadata
                 '-o', 'thumbnail:' + path.join(channelBase, 'metadata', '%(title).100s.%(ext)s'),
                 item.url
             ]
@@ -55,7 +52,7 @@ function buildCommandArgs(item) {
 
 /**
  * Spawns the CLI process, pipes standard output, and parses real-time progress.
- * * @param {Object} item - The current item from the queue
+ * @param {Object} item - The current item from the queue
  * @param {Function} onProgress - Callback function triggered when regex finds a percentage update (passes integer 0-100)
  * @returns {Promise} Resolves on successful exit (code 0). Rejects on failure or cancellation.
  */
