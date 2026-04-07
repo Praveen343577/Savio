@@ -43,7 +43,7 @@ function buildCommandArgs(item) {
             args: [
                 ...baseArgs,
                 '--directory', stagingDir,
-                '--filename', '{id}.{extension}',
+                '--filename', '{id}_{num}.{extension}',
                 item.url
             ]
         };
