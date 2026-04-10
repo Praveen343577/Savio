@@ -84,7 +84,7 @@ function ControlBar() {
                 {statusMessage && <span className="status-message">{statusMessage}</span>}
             </div>
 
-            <div className="global-controls">
+            {/* <div className="global-controls">
                 <button 
                     className="btn btn-warning" 
                     onClick={() => handleCommand('pause')}
@@ -103,7 +103,7 @@ function ControlBar() {
                 >
                     Cancel Active
                 </button>
-            </div>
+            </div> */}
         </div>
     );
 }
