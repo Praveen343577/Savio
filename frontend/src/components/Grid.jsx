@@ -5,14 +5,17 @@ function Grid({ queue }) {
     if (!queue || queue.length === 0) {
         return (
             <div className="empty-state">
+                <span className="empty-asterisk">*</span>
                 <h2>Queue is empty</h2>
                 <p>Upload a .txt file containing URLs to begin.</p>
             </div>
         );
     }
 
+    const gridKey = `grid-${queue.length}`;
+
     return (
-        <div className="grid-container">
+        <div key={gridKey} className="grid-container stagger-children visible">
             {queue.map(item => (
                 <Card key={item.id} item={item} />
             ))}

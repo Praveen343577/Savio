@@ -1,10 +1,12 @@
 import React, { useRef, useState } from 'react';
 import { api } from '../services/api';
+import { useMagnetic } from '../hooks/useMagnetic';
 
 function ControlBar() {
     const fileInputRef = useRef(null);
     const [statusMessage, setStatusMessage] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
+    const magnetic = useMagnetic(0.2);
 
     const handleFileUpload = async (event) => {
         const file = event.target.files[0];
@@ -71,7 +73,7 @@ function ControlBar() {
                 />
                 <label 
                     htmlFor="file-upload" 
-                    className="btn-upload"
+                    className="btn-upload" {...magnetic}
                     onMouseMove={handleMagneticMove}
                     onMouseLeave={handleMagneticLeave}
                 >

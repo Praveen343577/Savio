@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { memo } from 'react';
 
-function Card({ item }) {
+const Card = memo(({ item }) => {
     // SVG Circular Progress Math
     const radius = 24;
     const circumference = 2 * Math.PI * radius;
-    // Calculate offset based on percentage (0-100)
     const strokeDashoffset = circumference - (item.progress / 100) * circumference;
 
     return (
@@ -59,6 +58,7 @@ function Card({ item }) {
             </div>
         </div>
     );
-}
+});
 
+Card.displayName = 'Card';
 export default Card;

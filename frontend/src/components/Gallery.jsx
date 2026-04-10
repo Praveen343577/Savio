@@ -89,8 +89,11 @@ function Gallery() {
     if (error) return <div className="gallery-message error">{error}</div>;
     if (metadata.length === 0) return <div className="gallery-message">No metadata found on disk.</div>;
 
+    // Key-Forced Remounting triggers the .stagger-children CSS on data load
+    const galleryKey = `gallery-${metadata.length}`;
+
     return (
-        <div className="gallery-grid">
+        <div key={galleryKey} className="gallery-grid stagger-children visible">
             {metadata.map((rawItem, index) => {
                 const item = normalizeData(rawItem);
                 
