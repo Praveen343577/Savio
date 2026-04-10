@@ -3,16 +3,15 @@ import { api } from './services/api';
 import ControlBar from './components/ControlBar';
 import Grid from './components/Grid';
 import Gallery from './components/Gallery';
+import CustomCursor from './components/CustomCursor';
 
 function App() {
   const [queue, setQueue] = useState([]);
-  const [view, setView] = useState('grid'); // Enum: 'grid' | 'gallery'
+  const [view, setView] = useState('grid');
 
   useEffect(() => {
-    // Initial static fetch on mount
     api.fetchQueue().then(setQueue).catch(console.error);
 
-    // Open SSE connection for real-time memory sync
     const eventSource = api.createEventSource();
 
     eventSource.onmessage = (event) => {
@@ -24,38 +23,43 @@ function App() {
       console.error('SSE Stream Error:', err);
     };
 
-    // Cleanup stream on component unmount
     return () => eventSource.close();
   }, []);
 
-  // Lock condition: Gallery is disabled if any item is not completed/failed
   const isProcessing = queue.some(item =>
     ['pending', 'active', 'paused'].includes(item.status)
   );
 
   return (
-    <div className="app-container">
-      <header className="global-header">
-        <h1>YIPT Downloader</h1>
-        <nav className="view-toggles">
+    <div className="app-wrapper">
+      {/* Target UI overlays */}
+      <div className="grain"></div>
+      <CustomCursor />
+
+      <nav className="navbar">
+        <div className="navbar-brand">
+          savio<span>*</span>
+        </div>
+        
+        <div className="navbar-tabs">
           <button
-            className={view === 'grid' ? 'active' : ''}
+            className={`tab-btn ${view === 'grid' ? 'active' : ''}`}
             onClick={() => setView('grid')}
           >
             Queue
           </button>
           <button
-            className={view === 'gallery' ? 'active' : ''}
+            className={`tab-btn ${view === 'gallery' ? 'active' : ''}`}
             onClick={() => setView('gallery')}
             disabled={isProcessing}
             title={isProcessing ? "Locked: Downloads in progress" : "View Extracted Metadata"}
           >
             Gallery
           </button>
-        </nav>
-      </header>
+        </div>
+      </nav>
 
-      <main className="main-content">
+      <main className="page-content">
         {view === 'grid' ? (
           <>
             <ControlBar />
