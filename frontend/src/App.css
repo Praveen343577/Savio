@@ -386,27 +386,31 @@
   overflow: hidden;
 }
 
+/* Update these rules in App.css */
+
 .url-container {
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
   font-size: 0.7rem;
   font-weight: 400;
   color: var(--color-muted);
   letter-spacing: 0.01em;
   line-height: 1.5;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   padding: 0.5rem 0.625rem;
   background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: 1px;
+  overflow: hidden;
 }
 
-/* Card footer — progress ring */
-.card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
+.url-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .card-loader-container {
@@ -415,42 +419,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: -10px 0; 
 }
-
-.progress-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 52px;
-}
-
-.progress-ring {
-  transform: rotate(-90deg);
-}
-
-.progress-ring-bg {
-  stroke: var(--color-border);
-}
-
-.progress-ring-indicator {
-  stroke: var(--color-accent);
-  transition: stroke-dashoffset 0.4s var(--ease-out-expo);
-}
-
-.state-completed .progress-ring-indicator { stroke: #4caf50; }
-.state-failed    .progress-ring-indicator { stroke: #e53935; }
-.state-paused    .progress-ring-indicator { stroke: #fb8c00; }
-
-.progress-text {
-  position: absolute;
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--color-dark);
-}
-
 
 /* ─── GALLERY (future use) ───────────────────────────────── */
 

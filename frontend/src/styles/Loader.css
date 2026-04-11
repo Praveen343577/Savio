@@ -1,12 +1,12 @@
 /* From Uiverse.io by andrew-manzyk */ 
 .loader {
-  --color-one: red;
-  --color-two: blue;
+  --color-one: rgb(255, 0, 0);
+  --color-two: rgb(255, 174, 0);
   --color-three: yellow;
-  --color-fore: cyan;
-  --color-five: white;
-  --time-animation: 1s;
-  --size: 32px;
+  --color-fore: rgb(255, 0, 0);
+  --color-five: rgb(255, 255, 255);
+  --time-animation: 2s;
+  --size: 44px;
   position: relative;
   display: flex;
   justify-content: center;
