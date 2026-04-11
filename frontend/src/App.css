@@ -379,9 +379,15 @@
 /* Card body — URL */
 .card-body {
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  overflow: hidden;
 }
 
 .url-container {
+  flex: 1;
   font-size: 0.7rem;
   font-weight: 400;
   color: var(--color-muted);
@@ -401,6 +407,14 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
+}
+
+.card-loader-container {
+  flex-shrink: 0;
+  transform: scale(0.6); 
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .progress-wrapper {

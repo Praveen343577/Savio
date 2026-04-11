@@ -1,10 +1,13 @@
 import React, { memo } from 'react';
+import Loader from './Loader';
 
 const Card = memo(({ item }) => {
     // SVG Circular Progress Math
     const radius = 24;
     const circumference = 2 * Math.PI * radius;
     const strokeDashoffset = circumference - (item.progress / 100) * circumference;
+
+    const isActive = item.status === 'active';
 
     return (
         <div className={`card state-${item.status}`}>
@@ -26,6 +29,11 @@ const Card = memo(({ item }) => {
                 <div className="url-container" title={item.url}>
                     {item.url}
                 </div>
+                {isActive && (
+                    <div className="card-loader-container">
+                        <Loader />
+                    </div>
+                )}
             </div>
 
             <div className="card-footer">
