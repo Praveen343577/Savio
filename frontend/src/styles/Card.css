@@ -5,7 +5,6 @@
 .card {
   background-color: var(--color-card-bg);
   border: 1px solid var(--color-border);
-  border-radius: 2px;
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
@@ -19,27 +18,6 @@
   transform: translateY(-6px);
   box-shadow: 0 16px 40px rgba(26, 26, 26, 0.1);
   border-color: transparent;
-}
-
-/* Status-based left border accent */
-.card.state-active {
-  border-left: 3px solid var(--color-accent);
-}
-
-.card.state-completed {
-  border-left: 3px solid #4caf50;
-}
-
-.card.state-failed {
-  border-left: 3px solid #e53935;
-}
-
-.card.state-paused {
-  border-left: 3px solid #fb8c00;
-}
-
-.card.state-pending {
-  border-left: 3px solid var(--color-border);
 }
 
 /* Card header */
@@ -64,7 +42,6 @@
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  border-radius: 1px;
   line-height: 1.6;
 }
 
@@ -146,7 +123,6 @@
   padding: 0.5rem 0.625rem;
   background: var(--color-bg);
   border: 1px solid var(--color-border);
-  border-radius: 1px;
   overflow: hidden;
 }
 
