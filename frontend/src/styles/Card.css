@@ -22,53 +22,24 @@
   border-color: transparent;
 }
 
-/* Gradient download progress bar */
-.card.state-active::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  height: 3px;
-  width: 100%;
-  background: linear-gradient(to right, orange, blue, orange);
-  background-size: 200% 100%;
-  animation: progressGradient 2s linear infinite;
-}
-
-@keyframes progressGradient {
-  0% { background-position: 100% 0; }
-  100% { background-position: -100% 0; }
-}
-
 /* Card body — URL */
-.card-body {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  overflow: hidden;
-}
-
 .url-container {
-  flex: 1;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 400;
   color: var(--color-muted);
   letter-spacing: 0.01em;
-  line-height: 1.5;
   padding: 0.625rem 0.875rem;
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
   overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 .platform-icon {
-  width: 16px;
-  height: 16px;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
 }
 
@@ -88,4 +59,40 @@
   align-items: center;
   justify-content: center;
   margin: -10px 0;
+}
+
+/* ============================================================
+   PROGRESS INDICATOR
+   ============================================================ */
+
+.progress-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: var(--color-border);
+  z-index: 2;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255, 87, 34, 1) 0%, rgba(201, 29, 253, 1) 50%, rgba(0, 168, 221, 1) 100%);
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.progress-text {
+  position: absolute;
+  left: 100%; /* Tracks the grow point (tip of the bar) */
+  bottom: 8px; /* Position above the progress bar */
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  background: linear-gradient(90deg, rgba(255, 87, 34, 1) 0%, rgba(201, 29, 253, 1) 50%, rgba(0, 168, 221, 1) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  white-space: nowrap;
+  transition: transform 0.2s ease;
 }
