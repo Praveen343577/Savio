@@ -47,18 +47,6 @@ function ControlBar() {
         reader.readAsText(file);
     };
 
-    const handleMagneticMove = (e) => {
-        const btn = e.currentTarget;
-        const rect = btn.getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width / 2;
-        const y = e.clientY - rect.top - rect.height / 2;
-        btn.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
-    };
-
-    const handleMagneticLeave = (e) => {
-        e.currentTarget.style.transform = 'translate(0, 0)';
-    };
-
     return (
         <div className="control-bar">
             <div className="upload-section">
@@ -73,9 +61,8 @@ function ControlBar() {
                 />
                 <label 
                     htmlFor="file-upload" 
-                    className="btn-upload" {...magnetic}
-                    onMouseMove={handleMagneticMove}
-                    onMouseLeave={handleMagneticLeave}
+                    className="btn-upload" 
+                    {...magnetic}
                 >
                     <span>
                         <span className="btn-dot" style={{ display: 'inline-block', marginRight: '8px' }}></span>
