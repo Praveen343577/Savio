@@ -62,6 +62,59 @@
 }
 
 /* ============================================================
+   MEDIA INFO PILLS — resolution, fps, codec, ext
+   ============================================================ */
+
+.card-info-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0 0.875rem;
+}
+
+.card-info-pill {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--color-border);
+  color: var(--color-muted);
+  background: var(--color-bg);
+  border-radius: 1px;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   DOWNLOAD STATS ROW — size, speed, ETA
+   ============================================================ */
+
+.card-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0 0.875rem;
+}
+
+.card-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-dark);
+  letter-spacing: 0.01em;
+}
+
+.card-stat-label {
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* ============================================================
    PROGRESS INDICATOR
    ============================================================ */
 
@@ -84,8 +137,8 @@
 
 .progress-text {
   position: absolute;
-  left: 100%; /* Tracks the grow point (tip of the bar) */
-  bottom: 8px; /* Position above the progress bar */
+  left: 100%;
+  bottom: 8px;
   font-size: 0.85rem;
   font-weight: 800;
   letter-spacing: 0.02em;

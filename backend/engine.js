@@ -9,58 +9,76 @@ const { runLoop, broadcastState } = require('./scheduler');
 function initEngine() {
     let queue = readQueue();
     let mutated = false;
-    // Revert any items stuck in 'active' or 'paused' from a previous server shutdown
     queue.forEach(item => {
         if (item.status === 'active' || item.status === 'paused') {
-            item.status = 'pending';
+            item.status   = 'pending';
             item.progress = 0;
+            item.speed    = null;
+            item.eta      = null;
             mutated = true;
         }
     });
     if (mutated) writeQueue(queue);
-
-    // Start background loop
     runLoop();
 }
 
 /**
- * External Control: Pauses the global engine and suspends active child process.
+ * Pauses the global engine and suspends ALL active child processes.
  */
 function triggerPause() {
     controlState.isGlobalPaused = true;
-    pauseActive();
+    pauseActive(); // No ID = pause all
 
     let queue = readQueue();
-    let activeItem = queue.find(i => i.status === 'active');
-    if (activeItem) {
-        activeItem.status = 'paused';
+    let mutated = false;
+    queue.forEach(item => {
+        if (item.status === 'active') {
+            item.status = 'paused';
+            mutated = true;
+        }
+    });
+    if (mutated) {
         writeQueue(queue);
         broadcastState();
     }
 }
 
 /**
- * External Control: Resumes the global engine and active child process.
+ * Resumes the global engine and all paused child processes.
  */
 function triggerResume() {
     controlState.isGlobalPaused = false;
-    resumeActive();
+    resumeActive(); // No ID = resume all
 
     let queue = readQueue();
-    let pausedItem = queue.find(i => i.status === 'paused');
-    if (pausedItem) {
-        pausedItem.status = 'active';
+    let mutated = false;
+    queue.forEach(item => {
+        if (item.status === 'paused') {
+            item.status = 'active';
+            mutated = true;
+        }
+    });
+    if (mutated) {
         writeQueue(queue);
         broadcastState();
     }
 }
 
 /**
- * External Control: Force cancels the active child process and resets its state to 0.
+ * Cancels a specific active download by item ID.
+ * If no ID is provided, cancels all active downloads.
  */
-function triggerCancel() {
-    cancelActive();
-    // Reversion logic is handled in the catch block of runLoop
+function triggerCancel(id) {
+    cancelActive(id); // Reversion to 'pending' is handled in scheduler's catch block
+}
+
+/**
+ * Sets the maximum number of concurrent downloads.
+ * Clamped to 1–8 to stay reasonable.
+ */
+function setConcurrency(n) {
+    controlState.concurrency = Math.max(1, Math.min(8, parseInt(n, 10) || 1));
+    console.log(`[ENGINE] Concurrency set to ${controlState.concurrency}`);
 }
 
 module.exports = {
@@ -68,5 +86,6 @@ module.exports = {
     engineEvents,
     triggerPause,
     triggerResume,
-    triggerCancel
+    triggerCancel,
+    setConcurrency
 };

@@ -18,7 +18,8 @@ let platformState = {
 
 let controlState = {
     isGlobalPaused: false,
-    isLoopRunning: false
+    isLoopRunning: false,
+    concurrency: 1  // Max simultaneous downloads. Adjustable at runtime via /control/concurrency.
 };
 
 module.exports = {

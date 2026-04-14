@@ -3,7 +3,7 @@ const BASE_URL = 'http://localhost:3000';
 export const api = {
     async fetchQueue() {
         const res = await fetch(`${BASE_URL}/queue`);
-        return res.json();
+        return res.json(); // Returns { items, concurrency }
     },
     async uploadUrls(urls) {
         const res = await fetch(`${BASE_URL}/upload`, {
@@ -21,9 +21,26 @@ export const api = {
         }
         return res.json();
     },
-    async control(action) { // action must be: 'pause', 'resume', or 'cancel'
-        const res = await fetch(`${BASE_URL}/control/${action}`, { 
-            method: 'POST' 
+    // action: 'pause' | 'resume'
+    async control(action) {
+        const res = await fetch(`${BASE_URL}/control/${action}`, { method: 'POST' });
+        return res.json();
+    },
+    // Cancels a specific item by ID, or all active downloads if no ID given
+    async cancelItem(id) {
+        const res = await fetch(`${BASE_URL}/control/cancel`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(id ? { id } : {})
+        });
+        return res.json();
+    },
+    // Sets max concurrent downloads (1–8)
+    async setConcurrency(value) {
+        const res = await fetch(`${BASE_URL}/control/concurrency`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ value })
         });
         return res.json();
     },

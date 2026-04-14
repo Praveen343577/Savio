@@ -4,20 +4,26 @@ import ControlBar from './components/ControlBar';
 import Grid from './components/Grid';
 import Gallery from './components/Gallery';
 import CustomCursor from './components/CustomCursor';
-import Loader from './components/Loader';
 
 function App() {
   const [queue, setQueue] = useState([]);
+  const [concurrency, setConcurrency] = useState(1);
   const [view, setView] = useState('grid');
 
   useEffect(() => {
-    api.fetchQueue().then(setQueue).catch(console.error);
+    api.fetchQueue()
+      .then(({ items, concurrency: c }) => {
+        setQueue(items);
+        setConcurrency(c);
+      })
+      .catch(console.error);
 
     const eventSource = api.createEventSource();
 
     eventSource.onmessage = (event) => {
-      const updatedQueue = JSON.parse(event.data);
-      setQueue(updatedQueue);
+      const { items, concurrency: c } = JSON.parse(event.data);
+      setQueue(items);
+      setConcurrency(c);
     };
 
     eventSource.onerror = (err) => {
@@ -33,7 +39,6 @@ function App() {
 
   return (
     <div className="app-wrapper">
-      {/* Target UI overlays */}
       <div className="grain"></div>
       <CustomCursor />
 
@@ -41,7 +46,7 @@ function App() {
         <div className="navbar-brand">
           savio<span>*</span>
         </div>
-        
+
         <div className="navbar-tabs">
           <button
             className={`tab-btn ${view === 'grid' ? 'active' : ''}`}
@@ -53,7 +58,7 @@ function App() {
             className={`tab-btn ${view === 'gallery' ? 'active' : ''}`}
             onClick={() => setView('gallery')}
             disabled={isProcessing}
-            title={isProcessing ? "Locked: Downloads in progress" : "View Extracted Metadata"}
+            title={isProcessing ? 'Locked: Downloads in progress' : 'View Extracted Metadata'}
           >
             Gallery
           </button>
@@ -63,7 +68,7 @@ function App() {
       <main className="page-content">
         {view === 'grid' ? (
           <>
-            <ControlBar />
+            <ControlBar concurrency={concurrency} onConcurrencyChange={setConcurrency} />
             <Grid queue={queue} />
           </>
         ) : (

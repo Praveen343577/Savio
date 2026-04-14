@@ -7,7 +7,7 @@
   padding: 1.5rem 2.5rem;
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 2rem;
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -84,4 +84,67 @@
   letter-spacing: 0.05em;
   color: var(--color-muted);
   animation: fadeUp 0.4s var(--ease-out-expo) forwards;
+}
+
+/* Upload section groups the file input, button, and status together */
+.upload-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* ============================================================
+   CONCURRENCY CONTROL — +/- stepper for simultaneous downloads
+   ============================================================ */
+
+.concurrency-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  /* Push to the right side of the control bar */
+}
+
+.concurrency-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-right: 0.25rem;
+}
+
+.concurrency-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--color-dark);
+  background: transparent;
+  border: 1.5px solid var(--color-border);
+  border-radius: 2px;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+  line-height: 1;
+}
+
+.concurrency-btn:hover:not(:disabled) {
+  border-color: var(--color-dark);
+  background: var(--color-dark);
+  color: #fff;
+}
+
+.concurrency-btn:disabled {
+  opacity: 0.3;
+}
+
+.concurrency-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-dark);
+  min-width: 1.25rem;
+  text-align: center;
+  letter-spacing: -0.02em;
 }
