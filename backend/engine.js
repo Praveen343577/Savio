@@ -1,7 +1,7 @@
 const EventEmitter = require('events');
 const fs = require('fs');
 const path = require('path');
-const { readQueue, writeQueue, logFailedLink } = require('./fileSystem');
+const { readQueue, writeQueue, logFailedLink, logDownloadedLink } = require('./fileSystem');
 const { executeItem, pauseActive, resumeActive, cancelActive } = require('./executor');
 const { runPostProcess } = require('./postProcess');
 
@@ -196,6 +196,9 @@ async function runLoop() {
                         for (const mediaPath of generatedPaths) {
                             await runPostProcess(mediaPath, finalJsonPath);
                         }
+
+                        const finalNames = generatedPaths.map(p => path.basename(p));
+                        logDownloadedLink(item.platform, item.url, finalNames);
                     }
                     fs.rmSync(stagingDir, { recursive: true, force: true });
                 }

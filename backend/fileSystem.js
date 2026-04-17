@@ -63,8 +63,28 @@ function logFailedLink(platform, url) {
     fs.appendFileSync(failFile, `${url}\n`);
 }
 
+function logDownloadedLink(platform, url, mediaNames) {
+    const dateObj = new Date();
+    const todayStr = `${dateObj.getFullYear()}_${String(dateObj.getMonth() + 1).padStart(2, '0')}_${String(dateObj.getDate()).padStart(2, '0')}`;
+
+    let platformName = platform;
+    if (platformName === 'twitter' || platformName === 'pinterest') {
+        platformName = platformName.charAt(0).toUpperCase() + platformName.slice(1);
+    }
+
+    const targetDir = path.join('D:\\Nu\\YIPT', platformName, todayStr);
+    if (!fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
+    }
+
+    const successFile = path.join(targetDir, '@downloadedLinks.txt');
+    const entry = `${url}\n${mediaNames.join('\n')}\n\n`;
+    fs.appendFileSync(successFile, entry);
+}
+
 module.exports = {
     writeQueue,
     readQueue,
-    logFailedLink
+    logFailedLink,
+    logDownloadedLink
 };
