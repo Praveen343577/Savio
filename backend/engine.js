@@ -1,7 +1,9 @@
 const EventEmitter = require('events');
 const fs = require('fs');
 const path = require('path');
-const { readQueue, writeQueue, logFailedLink } = require('./fileSystem');
+const os = require('os');
+
+const { readQueue, writeQueue, logFailedLink, logDownloadedLink } = require('./fileSystem');
 const { executeItem, pauseActive, resumeActive, cancelActive } = require('./executor');
 const { runPostProcess } = require('./postProcess');
 
@@ -113,7 +115,10 @@ async function runLoop() {
 
             const dateObj = new Date();
             const todayStr = `${dateObj.getFullYear()}_${String(dateObj.getMonth() + 1).padStart(2, '0')}_${String(dateObj.getDate()).padStart(2, '0')}`;
-            const baseDir = 'D:\\Nu\\YIPT';
+            
+            const primaryDir = 'D:\\Nu\\YIPT';
+            const baseDir = fs.existsSync(primaryDir) ? primaryDir : path.join(os.homedir(), 'Downloads', 'Savio');
+            if (!fs.existsSync(baseDir)) fs.mkdirSync(baseDir, { recursive: true });
 
             if (item.platform !== 'youtube') {
                 const stagingDir = path.join(baseDir, 'staging', item.id);
@@ -193,12 +198,17 @@ async function runLoop() {
                         const finalJsonPath = path.join(metaDir, `${primaryName}.info.json`);
                         fs.renameSync(jsonPath, finalJsonPath);
 
+                        let finalProcessedFiles = [];
                         for (const mediaPath of generatedPaths) {
-                            await runPostProcess(mediaPath, finalJsonPath);
+                            const finalMediaStr = await runPostProcess(mediaPath, finalJsonPath);
+                            finalProcessedFiles.push(path.basename(finalMediaStr));
                         }
+                        logDownloadedLink(item.platform, item.url, finalProcessedFiles);
                     }
                     fs.rmSync(stagingDir, { recursive: true, force: true });
                 }
+            } else {
+                logDownloadedLink(item.platform, item.url, ['(YouTube media saved to uploader directory)']);
             }
 
             // Note: In a robust setup, executor.js would return the exact downloaded file path.

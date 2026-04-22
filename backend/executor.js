@@ -1,5 +1,7 @@
 const { spawn } = require('child_process');
 const path = require('path');
+const os = require('os');
+const fs = require('fs');
 
 // Global reference to the currently running child process. 
 // Since constraint requires strictly 1 download at a time, a singleton reference is safe.
@@ -8,8 +10,12 @@ let activeProcess = null;
 // Track if the process was intentionally killed by the user so we don't treat it as a failure
 let isCancelled = false;
 
-// Hardcoded paths based on the established file system schema
-const BASE_DOWNLOAD_DIR = 'D:\\Nu\\YIPT';
+// Media is stored in YIPT folder on D drive if it exists, 
+// otherwise falls back to a "Savio" folder in the user's Downloads directory. 
+// This is where yt-dlp and gallery-dl will output by default, and where the post-processing module will look for files to organize.
+const primaryDir = 'D:\\Nu\\YIPT';
+const BASE_DOWNLOAD_DIR = fs.existsSync(primaryDir) ? primaryDir : path.join(os.homedir(), 'Downloads', 'Savio');
+if (!fs.existsSync(BASE_DOWNLOAD_DIR)) fs.mkdirSync(BASE_DOWNLOAD_DIR, { recursive: true });
 
 /**
  * Dynamically builds the CLI command and arguments based on the platform.

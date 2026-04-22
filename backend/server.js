@@ -3,13 +3,16 @@ const cors = require('cors');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 const { readQueue, writeQueue } = require('./fileSystem');
 const { initEngine, engineEvents, triggerPause, triggerResume, triggerCancel } = require('./engine');
 
 const app = express();
 const PORT = 3000;
-const BASE_DOWNLOAD_DIR = 'D:\\Nu\\YIPT';
+const primaryDir = 'D:\\Nu\\YIPT';
+const BASE_DOWNLOAD_DIR = fs.existsSync(primaryDir) ? primaryDir : path.join(os.homedir(), 'Downloads', 'Savio');
+if (!fs.existsSync(BASE_DOWNLOAD_DIR)) fs.mkdirSync(BASE_DOWNLOAD_DIR, { recursive: true });
 
 // Middleware
 app.use(cors());
