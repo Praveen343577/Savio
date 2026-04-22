@@ -9,7 +9,6 @@ let activeProcess = null;
 let isCancelled = false;
 
 // Hardcoded paths based on the established file system schema
-const CHROME_PROFILE = 'D:\\Projects\\Project_2\\Savio\\ChromeProfile';
 const BASE_DOWNLOAD_DIR = 'D:\\Nu\\YIPT';
 
 /**
@@ -17,7 +16,8 @@ const BASE_DOWNLOAD_DIR = 'D:\\Nu\\YIPT';
  */
 function buildCommandArgs(item) {
     const today = new Date().toISOString().split('T')[0];
-    const baseArgs = ['--cookies-from-browser', `chrome:${CHROME_PROFILE}`, '--write-info-json'];
+    const cookiePath = path.join(__dirname, '..', '..', 'inputs', 'cookies', `${item.platform}_cookies.txt`);
+    const baseArgs = ['--cookies', cookiePath, '--write-info-json'];
 
     if (item.platform === 'youtube') {
         const channelBase = path.join(BASE_DOWNLOAD_DIR, 'youtube', '%(uploader)s');

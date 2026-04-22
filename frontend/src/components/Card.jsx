@@ -1,9 +1,6 @@
 import React, { memo } from 'react';
-import Loader from './Loader';
 
 const Card = memo(({ item }) => {
-
-    const isActive = item.status === 'active';
 
     return (
         <div className={`card state-${item.status}`}>
@@ -24,11 +21,6 @@ const Card = memo(({ item }) => {
             <div className="card-body">
                 <div className="url-container" title={item.url}>
                     <span className="url-text">{item.url}</span>
-                    {isActive && (
-                        <div className="card-loader-container">
-                            <Loader />
-                        </div>
-                    )}
                 </div>
             </div>
         </div>
