@@ -169,6 +169,13 @@
   display: none;
 }
 
+.upload-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2.25rem;
+}
+
 /* Primary upload button — sliding fill on hover */
 .btn-upload {
   position: relative;
@@ -185,7 +192,6 @@
   color: var(--color-dark);
   background: transparent;
   border: 1.5px solid var(--color-dark);
-  border-radius: 2px;
   transition: color 0.4s var(--ease-out-expo), transform 0.3s var(--ease-out-expo), box-shadow 0.3s var(--ease-out-expo);
 }
 

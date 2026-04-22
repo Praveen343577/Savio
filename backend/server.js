@@ -100,6 +100,27 @@ app.post('/upload', (req, res) => {
     res.json({ message: `Successfully queued ${addedCount} items.`, total_queue: queue.length });
 });
 
+app.post('/upload/cookie', (req, res) => {
+    const { filename, content } = req.body;
+    if (!filename || !content) {
+        return res.status(400).json({ error: 'Missing filename or content' });
+    }
+
+    // Extract platform from filename assuming format "platform_cookies.txt" or "platform.txt"
+    const platform = filename.toLowerCase().split(/[_.]/)[0]; 
+    
+    // Path structure matches executor.js: path.join(__dirname, '..', '..', 'inputs', 'cookies')
+    // Adjust relative path depth based on server.js actual location
+    const cookieDir = path.join(__dirname, '..', 'inputs', 'cookies'); 
+    
+    if (!fs.existsSync(cookieDir)) fs.mkdirSync(cookieDir, { recursive: true });
+
+    const targetPath = path.join(cookieDir, `${platform}_cookies.txt`);
+    fs.writeFileSync(targetPath, content, 'utf8');
+
+    res.json({ message: `Successfully mapped ${filename} to ${platform} cookies.` });
+});
+
 /**
  * GET /metadata
  * Locks access if downloads are ongoing. If clear, returns all parsed .info.json data.

@@ -4,7 +4,6 @@ import ControlBar from './components/ControlBar';
 import Grid from './components/Grid';
 import Gallery from './components/Gallery';
 import CustomCursor from './components/CustomCursor';
-import Loader from './components/Loader';
 
 function App() {
   const [queue, setQueue] = useState([]);

@@ -4,6 +4,7 @@ import { useMagnetic } from '../hooks/useMagnetic';
 
 function ControlBar() {
     const fileInputRef = useRef(null);
+    const cookieInputRef = useRef(null);
     const [statusMessage, setStatusMessage] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
     const magnetic = useMagnetic(0.2);
@@ -47,10 +48,33 @@ function ControlBar() {
         reader.readAsText(file);
     };
 
+    const handleCookieUpload = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        setIsProcessing(true);
+        setStatusMessage(`Reading ${file.name}...`);
+
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const response = await api.uploadCookie(file.name, e.target.result);
+                setStatusMessage(response.message || 'Cookie uploaded.');
+            } catch (error) {
+                setStatusMessage(`Cookie upload failed: ${error.message}`);
+            } finally {
+                setIsProcessing(false);
+                if (cookieInputRef.current) cookieInputRef.current.value = '';
+                setTimeout(() => setStatusMessage(''), 3000);
+            }
+        };
+        reader.readAsText(file);
+    };
+
     const handleMagneticMove = (e) => {
         const btn = e.currentTarget;
         const rect = btn.getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width / 2;
+        const x = e.clientX - rect.left - rect.width / 10;
         const y = e.clientY - rect.top - rect.height / 2;
         btn.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
     };
@@ -80,6 +104,27 @@ function ControlBar() {
                     <span>
                         <span className="btn-dot" style={{ display: 'inline-block', marginRight: '8px' }}></span>
                         {isProcessing ? 'Processing...' : 'Upload .txt File'}
+                    </span>
+                </label>
+
+                <input 
+                    type="file" 
+                    accept=".txt" 
+                    ref={cookieInputRef} 
+                    onChange={handleCookieUpload} 
+                    disabled={isProcessing}
+                    id="cookie-upload"
+                    className="file-input"
+                />
+                <label 
+                    htmlFor="cookie-upload" 
+                    className="btn-upload" {...magnetic}
+                    onMouseMove={handleMagneticMove}
+                    onMouseLeave={handleMagneticLeave}
+                >
+                    <span>
+                        <span className="btn-dot" style={{ display: 'inline-block', marginRight: '8px' }}></span>
+                        Upload PlatformCookie.txt
                     </span>
                 </label>
                 {statusMessage && <span className="status-message">{statusMessage}</span>}

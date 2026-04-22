@@ -13,6 +13,14 @@ export const api = {
         });
         return res.json();
     },
+    async uploadCookie(filename, content) {
+        const res = await fetch(`${BASE_URL}/upload/cookie`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename, content })
+        });
+        return res.json();
+    },
     async fetchMetadata() {
         const res = await fetch(`${BASE_URL}/metadata`);
         if (!res.ok) {
