@@ -22,8 +22,7 @@ if (!fs.existsSync(BASE_DOWNLOAD_DIR)) fs.mkdirSync(BASE_DOWNLOAD_DIR, { recursi
  */
 function buildCommandArgs(item) {
     const today = new Date().toISOString().split('T')[0];
-    const cookiePath = path.join(__dirname, '..', '..', 'inputs', 'cookies', `${item.platform}_cookies.txt`);
-    const baseArgs = ['--cookies', cookiePath, '--write-info-json'];
+    const baseArgs = ['--write-info-json'];
 
     if (item.platform === 'youtube') {
         const channelBase = path.join(BASE_DOWNLOAD_DIR, 'youtube', '%(uploader)s');
