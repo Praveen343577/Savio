@@ -1,9 +1,10 @@
 const { spawn } = require('child_process');
 const path = require('path');
-
-// Map of item.id → child process reference.
-// Supports concurrent downloads; replaces the old singleton activeProcess.
-const activeProcesses = new Map();
+const os = require('os');
+const fs = require('fs');
+// Global reference to the currently running child process. 
+// Since constraint requires strictly 1 download at a time, a singleton reference is safe.
+let activeProcess = null;
 
 // Per-item cancellation flags. Checked in the 'close' handler to avoid
 // treating a user-triggered SIGKILL as a failure.
@@ -100,12 +101,22 @@ function fetchMediaInfo(item) {
         }, 15000);
     });
 }
+// Track if the process was intentionally killed by the user so we don't treat it as a failure
+let isCancelled = false;
+
+// Media is stored in YIPT folder on D drive if it exists, 
+// otherwise falls back to a "Savio" folder in the user's Downloads directory. 
+// This is where yt-dlp and gallery-dl will output by default, and where the post-processing module will look for files to organize.
+const primaryDir = 'D:\\Nu\\YIPT';
+const BASE_DOWNLOAD_DIR = fs.existsSync(primaryDir) ? primaryDir : path.join(os.homedir(), 'Downloads', 'Savio');
+if (!fs.existsSync(BASE_DOWNLOAD_DIR)) fs.mkdirSync(BASE_DOWNLOAD_DIR, { recursive: true });
 
 /**
  * Dynamically builds the CLI command and arguments based on the platform.
  */
 function buildCommandArgs(item) {
-    const baseArgs = ['--cookies-from-browser', `chrome:${CHROME_PROFILE}`, '--write-info-json'];
+    const today = new Date().toISOString().split('T')[0];
+    const baseArgs = ['--write-info-json'];
 
     if (item.platform === 'youtube') {
         const channelBase = path.join(BASE_DOWNLOAD_DIR, 'youtube', '%(uploader)s');

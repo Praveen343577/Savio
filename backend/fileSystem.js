@@ -1,8 +1,11 @@
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 const QUEUE_FILE = path.join(__dirname, '..', 'queue.json');
-const BASE_DOWNLOAD_DIR = 'D:\\Nu\\YIPT';
+const primaryDir = 'D:\\Nu\\YIPT';
+const BASE_DOWNLOAD_DIR = fs.existsSync(primaryDir) ? primaryDir : path.join(os.homedir(), 'Downloads', 'Savio');
+if (!fs.existsSync(BASE_DOWNLOAD_DIR)) fs.mkdirSync(BASE_DOWNLOAD_DIR, { recursive: true });
 
 function writeQueue(queueArray) {
     const tmpPath = QUEUE_FILE + '.tmp';
@@ -53,7 +56,7 @@ function logFailedLink(platform, url) {
         platformName = platformName.charAt(0).toUpperCase() + platformName.slice(1);
     }
 
-    const targetDir = path.join('D:\\Nu\\YIPT', platformName, todayStr);
+    const targetDir = path.join(BASE_DOWNLOAD_DIR, platformName, todayStr);
 
     if (!fs.existsSync(targetDir)) {
         fs.mkdirSync(targetDir, { recursive: true });
@@ -63,7 +66,7 @@ function logFailedLink(platform, url) {
     fs.appendFileSync(failFile, `${url}\n`);
 }
 
-function logDownloadedLink(platform, url, downloadedFiles) {
+function logDownloadedLink(platform, url, files) {
     const dateObj = new Date();
     const todayStr = `${dateObj.getFullYear()}_${String(dateObj.getMonth() + 1).padStart(2, '0')}_${String(dateObj.getDate()).padStart(2, '0')}`;
 
@@ -72,21 +75,28 @@ function logDownloadedLink(platform, url, downloadedFiles) {
         platformName = platformName.charAt(0).toUpperCase() + platformName.slice(1);
     }
 
-    const targetDir = path.join('D:\\Nu\\YIPT', platformName, todayStr);
-    if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+    const primaryDir = 'D:\\Nu\\YIPT';
+    const BASE_DOWNLOAD_DIR = fs.existsSync(primaryDir) ? primaryDir : path.join(require('os').homedir(), 'Downloads', 'Savio');
+    const targetDir = path.join(BASE_DOWNLOAD_DIR, platformName, todayStr);
 
-    const downloadFile = path.join(targetDir, '@downloaded.txt');
+    if (!fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
+    }
+
+    const successFile = path.join(targetDir, '@downloadedLinks.txt');
     
-    // Build the block: url on first line, then each file's base name (no extension, no path)
-    const fileLines = downloadedFiles.map(f => path.basename(f, path.extname(f))).join('\n');
-    const block = `${url}\n${fileLines}\n\n`;
-    
-    fs.appendFileSync(downloadFile, block);
+    let content = `${url}\n`;
+    files.forEach(f => {
+        content += `${f}\n`;
+    });
+    content += '\n';
+
+    fs.appendFileSync(successFile, content);
 }
 
 module.exports = {
     writeQueue,
     readQueue,
     logFailedLink,
-    logDownloadedLink 
+    logDownloadedLink
 };
