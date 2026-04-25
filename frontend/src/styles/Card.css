@@ -1,0 +1,151 @@
+/* ============================================================
+   CARD — Styles for individual item cards
+   ============================================================ */
+
+.card {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  transition: transform 0.5s var(--ease-out-expo),
+    box-shadow 0.5s var(--ease-out-expo),
+    border-color 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(26, 26, 26, 0.1);
+  border-color: transparent;
+}
+
+/* Card body — URL */
+.url-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--color-muted);
+  letter-spacing: 0.01em;
+  padding: 0.625rem 0.875rem;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.platform-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.url-text {
+  flex: 1;
+  min-width: 0;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-loader-container {
+  flex-shrink: 0;
+  transform: scale(0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: -10px 0;
+}
+
+/* ============================================================
+   MEDIA INFO PILLS — resolution, fps, codec, ext
+   ============================================================ */
+
+.card-info-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0 0.875rem;
+}
+
+.card-info-pill {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--color-border);
+  color: var(--color-muted);
+  background: var(--color-bg);
+  border-radius: 1px;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   DOWNLOAD STATS ROW — size, speed, ETA
+   ============================================================ */
+
+.card-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0 0.875rem;
+}
+
+.card-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-dark);
+  letter-spacing: 0.01em;
+}
+
+.card-stat-label {
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* ============================================================
+   PROGRESS INDICATOR
+   ============================================================ */
+
+.progress-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: var(--color-border);
+  z-index: 2;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255, 87, 34, 1) 0%, rgba(201, 29, 253, 1) 50%, rgba(0, 168, 221, 1) 100%);
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.progress-text {
+  position: absolute;
+  left: 100%;
+  bottom: 8px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  background: linear-gradient(90deg, rgba(255, 87, 34, 1) 0%, rgba(201, 29, 253, 1) 50%, rgba(0, 168, 221, 1) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  white-space: nowrap;
+  transition: transform 0.2s ease;
+}
