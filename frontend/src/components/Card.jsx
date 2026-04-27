@@ -23,6 +23,11 @@ const Card = memo(({ item }) => {
                     <span className="url-text">{item.url}</span>
                 </div>
             </div>
+            {item.status === 'active' && (
+                <div className="progress-container">
+                    <div className="progress-bar" style={{ width: `${item.progress || 0}%` }}></div>
+                </div>
+            )}
         </div>
     );
 });

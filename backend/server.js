@@ -5,9 +5,10 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
+require('dotenv').config();
 const { readQueue, writeQueue } = require('./fileSystem');
-const { initEngine, engineEvents, triggerPause, triggerResume, triggerCancel, setConcurrency } = require('./engine');
-const { controlState } = require('./engineState');
+const { initEngine, triggerPause, triggerResume, triggerCancel, setConcurrency } = require('./scheduler');
+const { controlState, engineEvents } = require('./engineState');
 
 const app = express();
 const PORT = 3000;
@@ -172,6 +173,44 @@ app.post('/control/concurrency', (req, res) => {
     }
     setConcurrency(value);
     res.json({ status: `Concurrency set to ${controlState.concurrency}.`, concurrency: controlState.concurrency });
+});
+
+/**
+ * POST /control/clear
+ * Clears all completed and failed items from the queue.
+ */
+app.post('/control/clear', (req, res) => {
+    let queue = readQueue();
+    const newQueue = queue.filter(item => item.status !== 'completed' && item.status !== 'failed');
+    writeQueue(newQueue);
+    engineEvents.emit('update', newQueue);
+    res.json({ status: `Cleared completed and failed items.` });
+});
+
+/**
+ * POST /control/retry
+ * Body: { id: "<itemId>" } - retries a specific item.
+ * No body - retries all failed items.
+ */
+app.post('/control/retry', (req, res) => {
+    const { id } = req.body || {};
+    let queue = readQueue();
+    let count = 0;
+    queue.forEach(item => {
+        if (item.status === 'failed') {
+            if (!id || item.id === id) {
+                item.status = 'pending';
+                item.retry_count = 0;
+                item.progress = 0;
+                count++;
+            }
+        }
+    });
+    if (count > 0) {
+        writeQueue(queue);
+        engineEvents.emit('update', queue);
+    }
+    res.json({ status: `Retrying ${count} failed items.` });
 });
 
 // ==========================================

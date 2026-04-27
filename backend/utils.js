@@ -23,8 +23,16 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/**
+ * Utility: Escapes special characters in a string for use in a regular expression.
+ */
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
 module.exports = {
     cleanFilename,
     getRandomInt,
-    sleep
+    sleep,
+    escapeRegExp
 };

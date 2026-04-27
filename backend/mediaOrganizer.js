@@ -3,10 +3,13 @@ const path = require('path');
 const { runPostProcess } = require('./postProcess');
 const { logDownloadedLink } = require('./fileSystem');
 
+const { escapeRegExp } = require('./utils');
+require('dotenv').config();
+
 async function organizeDownloadedMedia(item) {
     const dateObj = new Date();
     const todayStr = `${dateObj.getFullYear()}_${String(dateObj.getMonth() + 1).padStart(2, '0')}_${String(dateObj.getDate()).padStart(2, '0')}`;
-    const baseDir = 'D:\\Nu\\YIPT';
+    const baseDir = process.env.DOWNLOAD_DIR || require('path').join(require('os').homedir(), 'Downloads', 'Savio');
 
     if (item.platform === 'youtube') return;
 
@@ -56,7 +59,7 @@ async function organizeDownloadedMedia(item) {
         let vCount = 0;
         let pCount = 0;
 
-        const prefixPattern = new RegExp(`^${author} ([vp])(\\d+)`);
+        const prefixPattern = new RegExp(`^${escapeRegExp(author)} ([vp])(\\d+)`);
         for (const f of existingFiles) {
             const match = f.match(prefixPattern);
             if (match) {

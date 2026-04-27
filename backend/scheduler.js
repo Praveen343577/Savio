@@ -1,5 +1,5 @@
 const { readQueue, writeQueue, logFailedLink } = require('./fileSystem');
-const { fetchMediaInfo, executeItem, activeCount } = require('./executor');
+const { fetchMediaInfo, executeItem, activeCount, cancelActive } = require('./executor');
 const { organizeDownloadedMedia } = require('./mediaOrganizer');
 const { sleep, getRandomInt } = require('./utils');
 const { platformState, CONFIG, controlState, engineEvents } = require('./engineState');
@@ -162,7 +162,88 @@ async function runLoop() {
     }
 }
 
+/**
+ * Initializes the engine. Cleans up stale state from previous crashes.
+ */
+function initEngine() {
+    let queue = readQueue();
+    let mutated = false;
+    queue.forEach(item => {
+        if (item.status === 'active' || item.status === 'paused') {
+            item.status   = 'pending';
+            item.progress = 0;
+            item.speed    = null;
+            item.eta      = null;
+            mutated = true;
+        }
+    });
+    if (mutated) writeQueue(queue);
+    runLoop();
+}
+
+/**
+ * Pauses the global engine and suspends ALL active child processes (soft pause).
+ */
+function triggerPause() {
+    controlState.isGlobalPaused = true;
+
+    let queue = readQueue();
+    let mutated = false;
+    queue.forEach(item => {
+        if (item.status === 'active') {
+            item.status = 'paused';
+            mutated = true;
+        }
+    });
+    if (mutated) {
+        writeQueue(queue);
+        broadcastState();
+    }
+}
+
+/**
+ * Resumes the global engine and all paused child processes.
+ */
+function triggerResume() {
+    controlState.isGlobalPaused = false;
+
+    let queue = readQueue();
+    let mutated = false;
+    queue.forEach(item => {
+        if (item.status === 'paused') {
+            item.status = 'active';
+            mutated = true;
+        }
+    });
+    if (mutated) {
+        writeQueue(queue);
+        broadcastState();
+    }
+}
+
+/**
+ * Cancels a specific active download by item ID.
+ * If no ID is provided, cancels all active downloads.
+ */
+function triggerCancel(id) {
+    cancelActive(id); // Reversion to 'pending' is handled in scheduler's catch block
+}
+
+/**
+ * Sets the maximum number of concurrent downloads.
+ * Clamped to 1–8 to stay reasonable.
+ */
+function setConcurrency(n) {
+    controlState.concurrency = Math.max(1, Math.min(8, parseInt(n, 10) || 1));
+    console.log(`[ENGINE] Concurrency set to ${controlState.concurrency}`);
+}
+
 module.exports = {
     runLoop,
-    broadcastState
+    broadcastState,
+    initEngine,
+    triggerPause,
+    triggerResume,
+    triggerCancel,
+    setConcurrency
 };

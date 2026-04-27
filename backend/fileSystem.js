@@ -2,9 +2,10 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
+require('dotenv').config();
+
 const QUEUE_FILE = path.join(__dirname, '..', 'queue.json');
-const primaryDir = 'D:\\Nu\\YIPT';
-const BASE_DOWNLOAD_DIR = fs.existsSync(primaryDir) ? primaryDir : path.join(os.homedir(), 'Downloads', 'Savio');
+const BASE_DOWNLOAD_DIR = process.env.DOWNLOAD_DIR || path.join(os.homedir(), 'Downloads', 'Savio');
 if (!fs.existsSync(BASE_DOWNLOAD_DIR)) fs.mkdirSync(BASE_DOWNLOAD_DIR, { recursive: true });
 
 function writeQueue(queueArray) {
@@ -75,8 +76,6 @@ function logDownloadedLink(platform, url, files) {
         platformName = platformName.charAt(0).toUpperCase() + platformName.slice(1);
     }
 
-    const primaryDir = 'D:\\Nu\\YIPT';
-    const BASE_DOWNLOAD_DIR = fs.existsSync(primaryDir) ? primaryDir : path.join(require('os').homedir(), 'Downloads', 'Savio');
     const targetDir = path.join(BASE_DOWNLOAD_DIR, platformName, todayStr);
 
     if (!fs.existsSync(targetDir)) {

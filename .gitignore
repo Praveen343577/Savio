@@ -2,3 +2,5 @@ ChromeProfile/
 inputs/
 queue.json
 todo.txt
+node_modules/
+.env

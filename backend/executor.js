@@ -2,16 +2,14 @@ const { spawn } = require('child_process');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
-// Global reference to the currently running child process. 
-// Since constraint requires strictly 1 download at a time, a singleton reference is safe.
-let activeProcess = null;
+require('dotenv').config();
+
+// Global reference to the currently running child processes. 
+const activeProcesses = new Map();
 
 // Per-item cancellation flags. Checked in the 'close' handler to avoid
 // treating a user-triggered SIGKILL as a failure.
 const cancelledIds = new Set();
-
-const CHROME_PROFILE = 'D:\\Projects\\Project_2\\Savio\\ChromeProfile';
-const BASE_DOWNLOAD_DIR = 'D:\\Nu\\YIPT';
 
 /**
  * Runs yt-dlp / gallery-dl with --dump-json to fetch metadata about a URL
@@ -28,7 +26,6 @@ function fetchMediaInfo(item) {
         if (item.platform === 'youtube') {
             binary = 'yt-dlp';
             args = [
-                '--cookies-from-browser', `chrome:${CHROME_PROFILE}`,
                 '--dump-json',
                 '--no-playlist',
                 item.url
@@ -36,7 +33,6 @@ function fetchMediaInfo(item) {
         } else {
             binary = 'gallery-dl';
             args = [
-                '--cookies-from-browser', `chrome:${CHROME_PROFILE}`,
                 '--dump-json',
                 item.url
             ];
@@ -101,21 +97,13 @@ function fetchMediaInfo(item) {
         }, 15000);
     });
 }
-// Track if the process was intentionally killed by the user so we don't treat it as a failure
-let isCancelled = false;
-
-// Media is stored in YIPT folder on D drive if it exists, 
-// otherwise falls back to a "Savio" folder in the user's Downloads directory. 
-// This is where yt-dlp and gallery-dl will output by default, and where the post-processing module will look for files to organize.
-const primaryDir = 'D:\\Nu\\YIPT';
-const BASE_DOWNLOAD_DIR = fs.existsSync(primaryDir) ? primaryDir : path.join(os.homedir(), 'Downloads', 'Savio');
+const BASE_DOWNLOAD_DIR = process.env.DOWNLOAD_DIR || path.join(os.homedir(), 'Downloads', 'Savio');
 if (!fs.existsSync(BASE_DOWNLOAD_DIR)) fs.mkdirSync(BASE_DOWNLOAD_DIR, { recursive: true });
 
 /**
  * Dynamically builds the CLI command and arguments based on the platform.
  */
 function buildCommandArgs(item) {
-    const today = new Date().toISOString().split('T')[0];
     const baseArgs = ['--write-info-json'];
 
     if (item.platform === 'youtube') {
@@ -263,24 +251,18 @@ function executeItem(item, onProgress) {
 
 /**
  * Suspends a specific download by item ID, or all active downloads if no ID given.
+ * Note: SIGSTOP does not work natively on Windows. We just no-op the actual child process
+ * signal here, but the scheduler loop handles the soft pause by not spawning new downloads.
  */
 function pauseActive(id) {
-    if (id) {
-        activeProcesses.get(id)?.kill('SIGSTOP');
-    } else {
-        activeProcesses.forEach(proc => proc.kill('SIGSTOP'));
-    }
+    // Windows unsupported
 }
 
 /**
  * Resumes a specific download by item ID, or all paused downloads if no ID given.
  */
 function resumeActive(id) {
-    if (id) {
-        activeProcesses.get(id)?.kill('SIGCONT');
-    } else {
-        activeProcesses.forEach(proc => proc.kill('SIGCONT'));
-    }
+    // Windows unsupported
 }
 
 /**

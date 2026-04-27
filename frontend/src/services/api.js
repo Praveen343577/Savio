@@ -44,6 +44,18 @@ export const api = {
         });
         return res.json();
     },
+    async clearCompleted() {
+        const res = await fetch(`${BASE_URL}/control/clear`, { method: 'POST' });
+        return res.json();
+    },
+    async retryItem(id) {
+        const res = await fetch(`${BASE_URL}/control/retry`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(id ? { id } : {})
+        });
+        return res.json();
+    },
     createEventSource() {
         return new EventSource(`${BASE_URL}/stream`);
     }

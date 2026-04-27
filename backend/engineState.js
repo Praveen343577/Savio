@@ -3,10 +3,10 @@ const EventEmitter = require('events');
 const engineEvents = new EventEmitter();
 
 const CONFIG = {
-    youtube: { delay: [1000, 2000], limit: 9999, cooldown: [0, 0] },
-    pinterest: { delay: [1000, 2000], limit: 9999, cooldown: [0, 0] },
-    twitter: { delay: [1000, 2000], limit: 9999, cooldown: [0, 0] },
-    instagram: { delay: [1000, 2000], limit: 9999, cooldown: [0, 0] }
+    youtube:   { delay: [3000, 6000],    limit: 40,  cooldown: [300000, 420000] },
+    pinterest: { delay: [5000, 12000],   limit: 20,  cooldown: [600000, 720000] },
+    twitter:   { delay: [8000, 18000],   limit: 12,  cooldown: [900000, 1200000] },
+    instagram: { delay: [15000, 35000],  limit: 8,   cooldown: [1200000, 1800000] }
 };
 
 let platformState = {

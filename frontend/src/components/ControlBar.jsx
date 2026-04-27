@@ -59,6 +59,27 @@ function ControlBar({ concurrency, onConcurrencyChange }) {
         e.currentTarget.style.transform = 'translate(0, 0)';
     };
 
+    const handleConcurrencyChange = async (delta) => {
+        const newVal = concurrency + delta;
+        try {
+            await api.setConcurrency(newVal);
+            onConcurrencyChange(newVal);
+        } catch (error) {
+            console.error('Failed to update concurrency', error);
+        }
+    };
+
+    const handleAction = async (actionFn, actionName) => {
+        try {
+            await actionFn();
+            setStatusMessage(`${actionName} successful.`);
+        } catch (error) {
+            setStatusMessage(`Failed to ${actionName.toLowerCase()}: ${error.message}`);
+        } finally {
+            setTimeout(() => setStatusMessage(''), 3000);
+        }
+    };
+
     return (
         <div className="control-bar">
             <div className="upload-section">
@@ -83,6 +104,13 @@ function ControlBar({ concurrency, onConcurrencyChange }) {
                 </label>
 
                 {statusMessage && <span className="status-message">{statusMessage}</span>}
+            </div>
+
+            <div className="action-buttons" style={{ display: 'flex', gap: '0.5rem' }}>
+                <button className="btn-action" onClick={() => handleAction(() => api.control('pause'), 'Pause')}>Pause</button>
+                <button className="btn-action" onClick={() => handleAction(() => api.control('resume'), 'Resume')}>Resume</button>
+                <button className="btn-action" onClick={() => handleAction(() => api.cancelItem(), 'Cancel All')}>Cancel All</button>
+                <button className="btn-action" onClick={() => handleAction(() => api.clearCompleted(), 'Clear Completed')}>Clear Completed</button>
             </div>
 
             <div className="concurrency-control">

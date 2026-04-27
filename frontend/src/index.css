@@ -20,9 +20,11 @@ body {
   cursor: none;
 }
 
-/* Hide default cursor globally — custom cursor takes over */
-*, a, button {
-  cursor: none !important;
+/* Hide default cursor globally on devices with a pointing device */
+@media (pointer: fine) {
+  *, a, button {
+    cursor: none !important;
+  }
 }
 
 :root {
