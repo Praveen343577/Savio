@@ -11,13 +11,14 @@ html {
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #f5f3ef;
-  color: #1a1a1a;
+  background-color: var(--color-bg);
+  color: var(--color-text);
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   cursor: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Hide default cursor globally on devices with a pointing device */
@@ -27,18 +28,40 @@ body {
   }
 }
 
-:root {
+:root, [data-theme='light'] {
   --color-bg:        #f5f3ef;
+  --color-text:      #1a1a1a;
   --color-dark:      #1a1a1a;
   --color-accent:    #ff5722;
   --color-muted:     #6b6b6b;
   --color-border:    #e0ddd7;
   --color-card-bg:   #eeeae3;
+  --color-card-hover:#e8e4db;
+  --color-nav-bg:    rgba(245, 243, 239, 0.85);
 
   --font-sans:   'Inter', sans-serif;
   --font-serif:  'Playfair Display', serif;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --shadow-sm: 0 4px 12px rgba(26, 26, 26, 0.05);
+  --shadow-md: 0 8px 24px rgba(26, 26, 26, 0.1);
+  --shadow-lg: 0 16px 40px rgba(26, 26, 26, 0.15);
+}
+
+[data-theme='dark'] {
+  --color-bg:        #0f1014;
+  --color-text:      #f5f3ef;
+  --color-dark:      #f5f3ef;
+  --color-accent:    #ff5722;
+  --color-muted:     #a0a0a0;
+  --color-border:    #2a2b30;
+  --color-card-bg:   #1a1b20;
+  --color-card-hover:#22232a;
+  --color-nav-bg:    rgba(15, 16, 20, 0.85);
+
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5);
 }
 
 ::selection {

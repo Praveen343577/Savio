@@ -4,6 +4,7 @@ import ControlBar from './components/ControlBar';
 import Grid from './components/Grid';
 import Gallery from './components/Gallery';
 import CustomCursor from './components/CustomCursor';
+import ThemeToggle from './components/ThemeToggle';
 
 function App() {
   const [queue, setQueue] = useState([]);
@@ -62,6 +63,7 @@ function App() {
           >
             Gallery
           </button>
+          <ThemeToggle />
         </div>
       </nav>
 

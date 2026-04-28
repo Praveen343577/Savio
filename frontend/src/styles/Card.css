@@ -7,19 +7,75 @@
   overflow: hidden;
   background-color: var(--color-card-bg);
   border: 1px solid var(--color-border);
+  border-radius: 16px;
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
   gap: 0.875rem;
-  transition: transform 0.5s var(--ease-out-expo),
-    box-shadow 0.5s var(--ease-out-expo),
-    border-color 0.3s ease;
+  transition: transform 0.4s var(--ease-out-expo),
+    box-shadow 0.4s var(--ease-out-expo),
+    border-color 0.4s var(--ease-out-expo),
+    background-color 0.4s var(--ease-out-expo);
 }
 
 .card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 16px 40px rgba(26, 26, 26, 0.1);
-  border-color: transparent;
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-accent);
+  background-color: var(--color-card-hover);
+}
+
+/* Card Header */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.badge-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+}
+
+.platform-youtube {
+  background-color: #ff000020;
+  color: #ff0000;
+}
+
+.platform-twitter {
+  background-color: #1da1f220;
+  color: #1da1f2;
+}
+
+.status-completed {
+  background-color: #4caf5020;
+  color: #4caf50;
+}
+
+.status-active {
+  background-color: #2196f320;
+  color: #2196f3;
+}
+
+.status-pending {
+  background-color: #ff980020;
+  color: #ff9800;
+}
+
+.status-failed {
+  background-color: #f4433620;
+  color: #f44336;
 }
 
 /* Card body — URL */
@@ -50,6 +106,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--color-text);
 }
 
 .card-loader-container {
@@ -77,12 +134,19 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 0.2rem 0.5rem;
+  padding: 0.3rem 0.6rem;
   border: 1px solid var(--color-border);
-  color: var(--color-muted);
+  color: var(--color-text);
   background: var(--color-bg);
-  border-radius: 1px;
+  border-radius: 12px;
   white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.card-info-pill:hover {
+  border-color: var(--color-text);
+  background: var(--color-text);
+  color: var(--color-bg);
 }
 
 /* ============================================================
@@ -102,7 +166,7 @@
   gap: 0.35rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--color-dark);
+  color: var(--color-text);
   letter-spacing: 0.01em;
 }
 

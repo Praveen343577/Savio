@@ -24,14 +24,14 @@
   gap: 0.5rem;
   padding: 0.75rem 2rem;
   font-family: var(--font-sans);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--color-dark);
+  color: var(--color-text);
   background: transparent;
-  border: 1.5px solid var(--color-dark);
-  border-radius: 2px;
+  border: 1.5px solid var(--color-text);
+  border-radius: 24px;
   transition: color 0.4s var(--ease-out-expo), transform 0.3s var(--ease-out-expo), box-shadow 0.3s var(--ease-out-expo);
 }
 
@@ -42,7 +42,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: var(--color-dark);
+  background: var(--color-text);
   transition: left 0.4s var(--ease-out-expo);
   z-index: 0;
 }
@@ -52,9 +52,9 @@
 }
 
 .btn-upload:hover {
-  color: #fff;
+  color: var(--color-bg);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(26, 26, 26, 0.18);
+  box-shadow: var(--shadow-md);
 }
 
 .btn-upload span {
@@ -65,8 +65,8 @@
 .btn-upload .btn-dot {
   position: relative;
   z-index: 1;
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--color-accent);
   flex-shrink: 0;
@@ -74,7 +74,7 @@
 }
 
 .btn-upload:hover .btn-dot {
-  background: #fff;
+  background: var(--color-bg);
 }
 
 /* Status message */
@@ -91,6 +91,36 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+/* ============================================================
+   ACTION BUTTONS
+   ============================================================ */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-action {
+  font-family: var(--font-sans);
+  padding: 0.5rem 1.25rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text);
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  cursor: none;
+  transition: all 0.3s var(--ease-out-expo);
+}
+
+.btn-action:hover {
+  background-color: var(--color-text);
+  color: var(--color-bg);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 /* ============================================================
@@ -122,18 +152,20 @@
   justify-content: center;
   font-size: 1rem;
   font-weight: 400;
-  color: var(--color-dark);
-  background: transparent;
-  border: 1.5px solid var(--color-border);
-  border-radius: 2px;
-  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+  color: var(--color-text);
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  transition: all 0.2s ease;
   line-height: 1;
+  cursor: none;
 }
 
 .concurrency-btn:hover:not(:disabled) {
-  border-color: var(--color-dark);
-  background: var(--color-dark);
-  color: #fff;
+  border-color: var(--color-text);
+  background: var(--color-text);
+  color: var(--color-bg);
+  transform: scale(1.05);
 }
 
 .concurrency-btn:disabled {
@@ -143,8 +175,36 @@
 .concurrency-value {
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--color-dark);
+  color: var(--color-text);
   min-width: 1.25rem;
   text-align: center;
   letter-spacing: -0.02em;
+}
+
+/* ============================================================
+   RESPONSIVENESS
+   ============================================================ */
+
+@media (max-width: 900px) {
+  .control-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem 1rem;
+  }
+  
+  .concurrency-control {
+    margin-left: 0;
+  }
+
+  .action-buttons {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 600px) {
+  .upload-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
