@@ -5,6 +5,9 @@ function Gallery() {
     const [metadata, setMetadata] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [selectedPlatform, setSelectedPlatform] = useState('All');
+
+    const platforms = ['All', 'YouTube', 'Instagram', 'Twitter', 'Pinterest'];
 
     useEffect(() => {
         const loadMetadata = async () => {
@@ -89,38 +92,58 @@ function Gallery() {
     if (error) return <div className="gallery-message error">{error}</div>;
     if (metadata.length === 0) return <div className="gallery-message">No metadata found on disk.</div>;
 
+    const normalizedData = metadata.map(normalizeData);
+    const filteredMetadata = normalizedData.filter(item => {
+        if (selectedPlatform === 'All') return true;
+        return item.platform.includes(selectedPlatform.toLowerCase());
+    });
+
     // Key-Forced Remounting triggers the .stagger-children CSS on data load
-    const galleryKey = `gallery-${metadata.length}`;
+    const galleryKey = `gallery-${selectedPlatform}-${filteredMetadata.length}`;
 
     return (
-        <div key={galleryKey} className="gallery-grid stagger-children visible">
-            {metadata.map((rawItem, index) => {
-                const item = normalizeData(rawItem);
-                
-                return (
-                    <div key={item.id + index} className="gallery-card">
-                        <div className="gallery-card-image">
-                            {item.thumbnail ? (
-                                <img src={item.thumbnail} alt={item.title} loading="lazy" />
-                            ) : (
-                                <div className="no-image">No Thumbnail</div>
-                            )}
-                            <span className={`badge platform-${item.platform}`}>
-                                {item.platform}
-                            </span>
-                        </div>
-                        <div className="gallery-card-content">
-                            <h3 className="gallery-title" title={item.title}>{item.title}</h3>
-                            <p className="gallery-author">👤 {item.author}</p>
-                            <div className="gallery-stats">
-                                {item.stats.map((stat, i) => (
-                                    <span key={i} className="stat-pill">{stat}</span>
-                                ))}
+        <div className="gallery-container">
+            <div className="platform-tabs">
+                {platforms.map(platform => (
+                    <button
+                        key={platform}
+                        className={`platform-tab ${selectedPlatform === platform ? 'active' : ''}`}
+                        onClick={() => setSelectedPlatform(platform)}
+                    >
+                        {platform}
+                    </button>
+                ))}
+            </div>
+
+            {filteredMetadata.length === 0 ? (
+                <div className="gallery-message">No media found for {selectedPlatform}.</div>
+            ) : (
+                <div key={galleryKey} className="gallery-grid stagger-children visible">
+                    {filteredMetadata.map((item, index) => (
+                        <div key={item.id + index} className="gallery-card">
+                            <div className="gallery-card-image">
+                                {item.thumbnail ? (
+                                    <img src={item.thumbnail} alt={item.title} loading="lazy" />
+                                ) : (
+                                    <div className="no-image">No Thumbnail</div>
+                                )}
+                                <span className={`badge platform-${item.platform}`}>
+                                    {item.platform}
+                                </span>
+                            </div>
+                            <div className="gallery-card-content">
+                                <h3 className="gallery-title" title={item.title}>{item.title}</h3>
+                                <p className="gallery-author">👤 {item.author}</p>
+                                <div className="gallery-stats">
+                                    {item.stats.map((stat, i) => (
+                                        <span key={i} className="stat-pill">{stat}</span>
+                                    ))}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                );
-            })}
+                    ))}
+                </div>
+            )}
         </div>
     );
 }
