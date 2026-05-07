@@ -90,15 +90,14 @@ function ControlBar({ concurrency, onConcurrencyChange }) {
                         {isProcessing ? 'Processing...' : 'Upload .txt File'}
                     </span>
                 </label>
-
-                {statusMessage && <span className="status-message">{statusMessage}</span>}
             </div>
 
-            <div className="action-buttons" style={{ display: 'flex', gap: '0.5rem' }}>
+            <div className="action-buttons" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                 <button className="btn-action" onClick={() => handleAction(() => api.control('pause'), 'Pause')}>Pause</button>
                 <button className="btn-action" onClick={() => handleAction(() => api.control('resume'), 'Resume')}>Resume</button>
                 <button className="btn-action" onClick={() => handleAction(() => api.cancelItem(), 'Cancel All')}>Cancel All</button>
                 <button className="btn-action" onClick={() => handleAction(() => api.clearCompleted(), 'Clear Completed')}>Clear Completed</button>
+                {statusMessage && <span className="status-message" style={{ marginLeft: '1rem' }}>{statusMessage}</span>}
             </div>
 
             <div className="concurrency-control">
