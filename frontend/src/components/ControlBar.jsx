@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { api } from '../services/api';
 import { useMagnetic } from '../hooks/useMagnetic';
 
-function ControlBar({ concurrency, onConcurrencyChange }) {
+function ControlBar() {
     const fileInputRef = useRef(null);
     const [statusMessage, setStatusMessage] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
@@ -47,15 +47,7 @@ function ControlBar({ concurrency, onConcurrencyChange }) {
         reader.readAsText(file);
     };
 
-    const handleConcurrencyChange = async (delta) => {
-        const newVal = concurrency + delta;
-        try {
-            await api.setConcurrency(newVal);
-            onConcurrencyChange(newVal);
-        } catch (error) {
-            console.error('Failed to update concurrency', error);
-        }
-    };
+
 
     const handleAction = async (actionFn, actionName) => {
         try {
@@ -100,22 +92,6 @@ function ControlBar({ concurrency, onConcurrencyChange }) {
                 {statusMessage && <span className="status-message" style={{ marginLeft: '1rem' }}>{statusMessage}</span>}
             </div>
 
-            <div className="concurrency-control">
-                <span className="concurrency-label">Concurrent</span>
-                <button
-                    className="concurrency-btn"
-                    onClick={() => handleConcurrencyChange(-1)}
-                    disabled={concurrency <= 1}
-                    aria-label="Decrease concurrency"
-                >−</button>
-                <span className="concurrency-value">{concurrency}</span>
-                <button
-                    className="concurrency-btn"
-                    onClick={() => handleConcurrencyChange(1)}
-                    disabled={concurrency >= 8}
-                    aria-label="Increase concurrency"
-                >+</button>
-            </div>
         </div>
     );
 }
