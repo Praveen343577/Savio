@@ -7,7 +7,7 @@ const os = require('os');
 
 require('dotenv').config();
 const { readQueue, writeQueue } = require('./fileSystem');
-const { initEngine, triggerPause, triggerResume, triggerCancel, setConcurrency } = require('./scheduler');
+const { initEngine, triggerPause, triggerResume, triggerCancel } = require('./scheduler');
 const { controlState, engineEvents } = require('./engineState');
 
 const app = express();
@@ -52,8 +52,7 @@ function findFilesRecursively(dir, extension, fileList = []) {
  */
 app.get('/queue', (req, res) => {
     res.json({
-        items: readQueue(),
-        concurrency: controlState.concurrency
+        items: readQueue()
     });
 });
 
@@ -161,19 +160,7 @@ app.post('/control/cancel', (req, res) => {
     res.json({ status: msg });
 });
 
-/**
- * POST /control/concurrency
- * Body: { value: 3 }
- * Sets the maximum number of simultaneous downloads (clamped 1–8).
- */
-app.post('/control/concurrency', (req, res) => {
-    const { value } = req.body;
-    if (typeof value !== 'number') {
-        return res.status(400).json({ error: 'Expected { value: <number> }' });
-    }
-    setConcurrency(value);
-    res.json({ status: `Concurrency set to ${controlState.concurrency}.`, concurrency: controlState.concurrency });
-});
+
 
 /**
  * POST /control/clear
@@ -222,12 +209,12 @@ app.get('/stream', (req, res) => {
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
 
-    // Send initial state including concurrency
-    const payload = { items: readQueue(), concurrency: controlState.concurrency };
+    // Send initial state
+    const payload = { items: readQueue() };
     res.write(`data: ${JSON.stringify(payload)}\n\n`);
 
     const updateListener = (queueState) => {
-        const payload = { items: queueState, concurrency: controlState.concurrency };
+        const payload = { items: queueState };
         res.write(`data: ${JSON.stringify(payload)}\n\n`);
     };
 

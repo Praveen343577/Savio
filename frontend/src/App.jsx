@@ -8,23 +8,20 @@ import ThemeToggle from './components/ThemeToggle';
 
 function App() {
   const [queue, setQueue] = useState([]);
-  const [concurrency, setConcurrency] = useState(1);
   const [view, setView] = useState('grid');
 
   useEffect(() => {
     api.fetchQueue()
-      .then(({ items, concurrency: c }) => {
+      .then(({ items }) => {
         setQueue(items);
-        setConcurrency(c);
       })
       .catch(console.error);
 
     const eventSource = api.createEventSource();
 
     eventSource.onmessage = (event) => {
-      const { items, concurrency: c } = JSON.parse(event.data);
+      const { items } = JSON.parse(event.data);
       setQueue(items);
-      setConcurrency(c);
     };
 
     eventSource.onerror = (err) => {
@@ -70,7 +67,7 @@ function App() {
       <main className="page-content">
         {view === 'grid' ? (
           <>
-            <ControlBar concurrency={concurrency} onConcurrencyChange={setConcurrency} />
+            <ControlBar />
             <Grid queue={queue} />
           </>
         ) : (

@@ -10,7 +10,7 @@ function broadcastState() {
 
 /**
  * Handles the full lifecycle of a single queue item: preflight → execute → organize → complete.
- * Runs independently and concurrently alongside other active downloads.
+ * Runs independently alongside other active downloads.
  *
  * @param {Object} item - The queue item to process (already written as 'active' in queue.json)
  */
@@ -103,7 +103,7 @@ async function processItem(item) {
 
 /**
  * Main scheduler loop. Runs forever, polling for eligible items and
- * dispatching up to controlState.concurrency downloads simultaneously.
+ * dispatching up to 1 download simultaneously.
  *
  * Each dispatched item runs as a detached async task (fire-and-forget from
  * the loop's perspective) so the loop can immediately pick the next slot.
@@ -118,7 +118,7 @@ async function runLoop() {
             continue;
         }
 
-        const slots = controlState.concurrency - activeCount();
+        const slots = 1 - activeCount();
 
         if (slots <= 0) {
             await sleep(500);
@@ -150,7 +150,7 @@ async function runLoop() {
         writeQueue(queue);
         broadcastState();
 
-        // Fire each as an independent concurrent task
+        // Fire as an independent task
         candidates.forEach(item => {
             processItem(item).catch(err => {
                 console.error(`[ENGINE] Unhandled error in processItem for ${item.id}:`, err);
@@ -170,10 +170,10 @@ function initEngine() {
     let mutated = false;
     queue.forEach(item => {
         if (item.status === 'active' || item.status === 'paused') {
-            item.status   = 'pending';
+            item.status = 'pending';
             item.progress = 0;
-            item.speed    = null;
-            item.eta      = null;
+            item.speed = null;
+            item.eta = null;
             mutated = true;
         }
     });
@@ -229,21 +229,11 @@ function triggerCancel(id) {
     cancelActive(id); // Reversion to 'pending' is handled in scheduler's catch block
 }
 
-/**
- * Sets the maximum number of concurrent downloads.
- * Clamped to 1–8 to stay reasonable.
- */
-function setConcurrency(n) {
-    controlState.concurrency = Math.max(1, Math.min(8, parseInt(n, 10) || 1));
-    console.log(`[ENGINE] Concurrency set to ${controlState.concurrency}`);
-}
-
 module.exports = {
     runLoop,
     broadcastState,
     initEngine,
     triggerPause,
     triggerResume,
-    triggerCancel,
-    setConcurrency
+    triggerCancel
 };
